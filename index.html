@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Моя Визитка</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1:#0b1220;
+      --bg-2:#0f1b31;
+      --card:#0e1626cc;
+      --muted:#7b8aa0;
+      --text:#dbe9ff;
+      --accent:#62a1ff;
+      --accent-2:#6cf3ff;
+      --ok:#6ee7a2;
+      --err:#ff6b9e;
+      --link:#8ab4ff;
+      --shadow: 0 20px 40px rgba(7,13,27,.35), inset 0 1px 0 rgba(255,255,255,.03);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text); background:var(--bg-1);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
+    }
+    canvas#bgCanvas{position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;}
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .wrap{max-width:1050px; margin:26px auto; padding:0 18px; position:relative; z-index:2}
+
+    .card{
+      background:var(--card); backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); padding:24px; box-shadow:var(--shadow);
+      display:flex; flex-wrap:wrap; gap:26px; align-items:flex-start;
+      position:relative;
+      transition: transform 0.6s;
+    }
+    .card:hover{transform: rotateY(6deg) rotateX(3deg);}
+
+    .badge{position:absolute; right:14px; bottom:14px; font-size:22px;}
+
+    .avatar{
+      flex:0 0 250px; max-width:250px; border-radius:16px; overflow:hidden;
+      box-shadow: 0 0 25px rgba(108,243,255,.5);
+      border:2px solid rgba(108,243,255,.6);
+      transition:.4s;
+    }
+    .avatar:hover{box-shadow:0 0 45px rgba(108,243,255,.9);}
+    .avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+
+    .content{flex:1; min-width:250px}
+
+    .title{font-family: "JetBrains Mono", monospace; font-weight:800; font-size:38px; letter-spacing:.02em; margin:6px 0 18px; color:var(--accent);}
+
+    .kv{display:grid; gap:10px; font-family:"JetBrains Mono", monospace;}
+    .kv-row{display:grid; grid-template-columns: 160px 1fr; gap:8px; align-items:baseline}
+    .kv .k{color:var(--muted)}
+    .kv .v{color:var(--text)}
+
+    .status-online{color:var(--ok); font-weight:600;}
+
+    .socials{margin-top:18px; display:flex; flex-wrap:wrap; gap:12px}
+    .socials a{padding:8px 14px; border-radius:999px; font-size:14px; font-family:"JetBrains Mono", monospace;
+      background:rgba(98,161,255,.12); border:1px solid rgba(98,161,255,.35); color:var(--accent); transition:.2s}
+    .socials a:hover{background:rgba(98,161,255,.25)}
+
+    .terminal{margin-top:22px; background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:var(--shadow); position:relative; overflow:hidden}
+    .term-head{display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px dashed rgba(255,255,255,.08)}
+    .dots{display:flex; gap:8px}
+    .dot{width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.12);}
+    .term-title{font-family:"JetBrains Mono", monospace; font-size:14px; color:var(--muted)}
+    .term-body{padding:18px 16px 70px; font-family:"JetBrains Mono", monospace; min-height:140px}
+    .log{margin:8px 0; white-space:pre-wrap}
+    .arrow{color:var(--accent)}
+
+    /* Плеер */
+    .player{
+      margin-top:16px;
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:12px 16px;
+      font-family:"JetBrains Mono", monospace;
+    }
+    .track-info{margin-bottom:8px;}
+    .track-title{font-weight:600; font-size:16px; color:var(--accent);}
+    .track-artist{font-size:13px; color:var(--muted);}
+    .controls{display:flex; align-items:center; gap:14px;}
+    .controls button{
+      background:rgba(98,161,255,.12);
+      border:1px solid rgba(98,161,255,.35);
+      color:var(--accent);
+      font-size:18px;
+      padding:6px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      transition:.2s;
+    }
+    .controls button:hover{background:rgba(98,161,255,.25)}
+    .progress{flex:1; height:6px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden; cursor:pointer; position:relative;}
+    .bar{width:0%; height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .1s linear;}
+    .time{font-size:14px; color:var(--muted);}
+    .eq{display:flex; align-items:flex-end; gap:4px; height:20px; width:40px;}
+    .eq span{flex:1; background:var(--accent-2); border-radius:2px; animation: bounce 1s infinite ease-in-out;}
+    .eq span:nth-child(2){animation-delay: .2s}
+    .eq span:nth-child(3){animation-delay: .4s}
+    @keyframes bounce{0%,100%{height:4px}50%{height:20px}}
+
+    /* Слайдер громкости */
+    .volume {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2px solid var(--accent-2);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2px solid var(--accent-2);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <div class="wrap">
+    <section class="card">
+      <figure class="avatar">
+        <img src="avatar2.jpg" alt="avatar"/>
+      </figure>
+      <div class="content">
+        <h1 class="title">Biography</h1>
+        <div class="kv">
+          <div class="kv-row"><span class="k">Ник:</span><span class="v" id="nick">dkid-</span></div>
+          <div class="kv-row"><span class="k">Статус:</span><span class="v status-online">Online</span></div>
+          <div class="kv-row"><span class="k">Проект:</span><span class="v">Визитка</span></div>
+          <div class="kv-row"><span class="k">Контакт:</span><span class="v"><a id="contact" href="https://t.me/dkid_1" target="_blank">t.me/dkid_1</a></span></div>
+        </div>
+        <div class="socials">
+          <a href="https://t.me/dkid_1" target="_blank">Telegram</a>
+          <a href="https://steamcommunity.com/id/dkid-/" target="_blank">Steam</a>
+          <a href="https://discord.gg/Y3W2fxZc" target="_blank">Discord</a>
+        </div>
+        <div class="badge"></div>
+      </div>
+    </section>
+
+    <section class="terminal" aria-label="activity-log">
+      <div class="term-head">
+        <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="term-title">status.log</div>
+        <div style="opacity:.5">—</div>
+      </div>
+      <div class="term-body" id="log"></div>
+    </section>
+
+    <!-- Кастомный плеер -->
+    <section class="player">
+      <div class="track-info">
+        <div class="track-title" id="trackTitle">Rain</div>
+        <div class="track-artist" id="trackArtist">Reidenshi, Dagamon</div>
+      </div>
+      <audio id="audio" src="rain.mp3"></audio>
+      <div class="controls">
+        <button id="playBtn">▶</button>
+        <div class="eq"><span></span><span></span><span></span></div>
+        <div class="progress"><div class="bar" id="progressBar"></div></div>
+        <span class="time" id="time">00:00</span>
+        <div class="volume">
+          🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.6">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Терминал typing эффект
+    const log = document.getElementById("log");
+    const messages = [
+      "Инициализация системы...",
+      "Загрузка модулей...",
+      "Подключение к серверу...",
+    ];
+    let i = 0, j = 0, current = "";
+    function typeEffect() {
+      if (i < messages.length) {
+        if (j < messages[i].length) {
+          current += messages[i][j];
+          log.innerHTML = current;
+          j++;
+          setTimeout(typeEffect, 50);
+        } else {
+          current += "<br>";
+          j = 0; i++;
+          setTimeout(typeEffect, 300);
+        }
+      } else {
+        setTimeout(()=>{
+          log.innerHTML = "";
+          const d = new Date();
+          const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+          const time = d.toLocaleTimeString();
+          log.innerHTML = "Добро пожаловать ♛<br>" + `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${time}`;
+        },800);
+      }
+    }
+    typeEffect();
+
+    // Фоновые частицы
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let w,h,particles;
+    function resize(){w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; particles=[];
+      for(let i=0;i<80;i++){particles.push({x:Math.random()*w,y:Math.random()*h,dx:(Math.random()-0.5)*0.7,dy:(Math.random()-0.5)*0.7,r:Math.random()*2+1});}
+    }
+    function draw(){ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(108,243,255,0.7)';
+      for(let p of particles){ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); p.x+=p.dx; p.y+=p.dy;
+        if(p.x<0||p.x>w)p.dx*=-1; if(p.y<0||p.y>h)p.dy*=-1;}
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize',resize); resize(); draw();
+
+    // Плеер
+    const audio = document.getElementById("audio");
+    const playBtn = document.getElementById("playBtn");
+    const progress = document.querySelector(".progress");
+    const progressBar = document.getElementById("progressBar");
+    const timeEl = document.getElementById("time");
+    const eq = document.querySelector(".eq");
+    const volumeSlider = document.getElementById("volumeSlider");
+
+    playBtn.addEventListener("click", ()=>{
+      if(audio.paused){
+        audio.play();
+        playBtn.textContent = "⏸";
+        eq.style.visibility="visible";
+      }else{
+        audio.pause();
+        playBtn.textContent = "▶";
+        eq.style.visibility="hidden";
+      }
+    });
+
+    audio.addEventListener("timeupdate", ()=>{
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.width = percent + "%";
+      let m = Math.floor(audio.currentTime/60).toString().padStart(2,"0");
+      let s = Math.floor(audio.currentTime%60).toString().padStart(2,"0");
+      timeEl.textContent = `${m}:${s}`;
+    });
+
+    progress.addEventListener("click",(e)=>{
+      const rect = progress.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = percent * audio.duration;
+    });
+
+    eq.style.visibility="hidden";
+
+    // Управление громкостью
+    volumeSlider.addEventListener("input", ()=>{
+      audio.volume = volumeSlider.value;
+    });
+    audio.volume = volumeSlider.value;
+  </script>
+</body>
+</html>
