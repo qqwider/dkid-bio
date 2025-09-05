@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- AOS для анимаций -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <style>
     :root{
       --bg-1:#0b1220;
@@ -28,7 +30,7 @@
     body{
       margin:0; color:var(--text); background:var(--bg-1);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      overflow-x:hidden; /* убрали hidden, теперь можно скроллить вниз */
+      overflow-x:hidden; /* можно скроллить вниз */
     }
     canvas#bgCanvas{position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;}
     a{color:var(--link); text-decoration:none}
@@ -72,6 +74,17 @@
     .socials a{padding:8px 14px; border-radius:999px; font-size:14px; font-family:"JetBrains Mono", monospace;
       background:rgba(98,161,255,.12); border:1px solid rgba(98,161,255,.35); color:var(--accent); transition:.2s}
     .socials a:hover{background:rgba(98,161,255,.25)}
+
+    .copy-btn {
+      padding:8px 14px;
+      border-radius:999px;
+      font-size:14px;
+      font-family:"JetBrains Mono", monospace;
+      background:rgba(108,243,255,.12);
+      border:1px solid rgba(108,243,255,.35);
+      color:var(--accent-2);
+      cursor:pointer;
+    }
 
     .terminal{margin-top:22px; background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:var(--shadow); position:relative; overflow:hidden}
     .term-head{display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px dashed rgba(255,255,255,.08)}
@@ -117,60 +130,32 @@
     @keyframes bounce{0%,100%{height:4px}50%{height:20px}}
 
     /* Слайдер громкости */
-    .volume {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .volume { display:flex; align-items:center; gap:8px; }
     input[type=range] {
-      -webkit-appearance: none;
-      width: 100px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      outline: none;
-      cursor: pointer;
+      -webkit-appearance: none; width: 100px; height: 6px; border-radius: 999px; background: rgba(255,255,255,.08); outline: none; cursor: pointer;
     }
     input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      border: 2px solid var(--accent-2);
+      -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--accent-2);
     }
-    input[type=range]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      border: 2px solid var(--accent-2);
-    }
+    input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--accent-2); }
 
     /* 📱 Мобильная адаптация */
     @media (max-width: 600px) {
-      .card {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-      .avatar {
-        margin-bottom: 16px;
-      }
-      .kv-row {
-        grid-template-columns: 1fr; /* ключи и значения в столбик */
-        text-align: left;
-      }
+      body {overflow-y:auto;}
+      .card {flex-direction:column; align-items:center; text-align:center;}
+      .avatar {max-width:180px; border-radius:50%;}
+      .title {font-size:26px;}
+      .kv-row {grid-template-columns: 120px 1fr; font-size:14px;}
+      .socials {justify-content:center;}
+      .socials a, .copy-btn {font-size:13px; padding:10px 16px;}
+      .player {padding:10px;}
     }
   </style>
 </head>
 <body>
   <canvas id="bgCanvas"></canvas>
   <div class="wrap">
-    <section class="card">
+    <section class="card" data-aos="fade-up">
       <figure class="avatar">
         <img src="avatar2.jpg" alt="avatar"/>
       </figure>
@@ -180,7 +165,7 @@
           <div class="kv-row"><span class="k">Ник:</span><span class="v" id="nick">dkid-</span></div>
           <div class="kv-row"><span class="k">Статус:</span><span class="v status-online">Online</span></div>
           <div class="kv-row"><span class="k">Проект:</span><span class="v">Визитка</span></div>
-          <div class="kv-row"><span class="k">Контакт:</span><span class="v"><a id="contact" href="https://t.me/dkid_1" target="_blank">t.me/dkid_1</a></span></div>
+          <div class="kv-row"><span class="k">Контакт:</span><span class="v"><a id="contact" href="https://t.me/dkid_1" target="_blank">t.me/dkid_1</a> </span></div>
         </div>
         <div class="socials">
           <a href="https://t.me/dkid_1" target="_blank">Telegram</a>
@@ -191,7 +176,7 @@
       </div>
     </section>
 
-    <section class="terminal" aria-label="activity-log">
+    <section class="terminal" aria-label="activity-log" data-aos="fade-up">
       <div class="term-head">
         <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
         <div class="term-title">status.log</div>
@@ -201,7 +186,7 @@
     </section>
 
     <!-- Кастомный плеер -->
-    <section class="player">
+    <section class="player" data-aos="fade-up">
       <div class="track-info">
         <div class="track-title" id="trackTitle">Rain</div>
         <div class="track-artist" id="trackArtist">Reidenshi, Dagamon</div>
@@ -212,15 +197,17 @@
         <div class="eq"><span></span><span></span><span></span></div>
         <div class="progress"><div class="bar" id="progressBar"></div></div>
         <span class="time" id="time">00:00</span>
-        <div class="volume">
-          🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.6">
-        </div>
+        <div class="volume"> 🔊 <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.6"> </div>
       </div>
     </section>
   </div>
 
+  <!-- AOS script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init({duration:800, once:true});</script>
+
   <script>
-    // Терминал typing эффект
+    // Терминал typing эффект + живые часы
     const log = document.getElementById("log");
     const messages = [
       "Инициализация системы...",
@@ -242,36 +229,49 @@
         }
       } else {
         setTimeout(() => {
-		  log.innerHTML = "";
-		  const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
-
-		  function updateTime() {
-			const d = new Date();
-			const time = d.toLocaleTimeString();
-			log.innerHTML = "Добро пожаловать ♛<br>" + `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${time}`;
-		  }
-
-		  updateTime();                  // показать сразу
-		  setInterval(updateTime, 1000); // обновлять каждую секунду
-		}, 800);
-
+          updateTime();
+          setInterval(updateTime, 1000);
+        }, 800);
       }
+    }
+    function updateTime(){
+      const d = new Date();
+      const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+      const time = d.toLocaleTimeString();
+      log.innerHTML = "Добро пожаловать ♛<br>" + `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${time}`;
     }
     typeEffect();
 
-    // Фоновые частицы
+    // Фоновые частицы (меньше на мобилках)
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
-    let w,h,particles;
-    function resize(){w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; particles=[];
-      for(let i=0;i<80;i++){particles.push({x:Math.random()*w,y:Math.random()*h,dx:(Math.random()-0.5)*0.7,dy:(Math.random()-0.5)*0.7,r:Math.random()*2+1});}
+    let w, h, particles;
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      particles = [];
+      let count = window.innerWidth < 600 ? 30 : 80;
+      for(let i=0;i<count;i++){
+        particles.push({
+          x:Math.random()*w,
+          y:Math.random()*h,
+          dx:(Math.random()-0.5)*0.7,
+          dy:(Math.random()-0.5)*0.7,
+          r:Math.random()*2+1
+        });
+      }
     }
-    function draw(){ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(108,243,255,0.7)';
-      for(let p of particles){ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); p.x+=p.dx; p.y+=p.dy;
-        if(p.x<0||p.x>w)p.dx*=-1; if(p.y<0||p.y>h)p.dy*=-1;}
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle='rgba(108,243,255,0.7)';
+      for(let p of particles){
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.x<0||p.x>w)p.dx*=-1; if(p.y<0||p.y>h)p.dy*=-1;
+      }
       requestAnimationFrame(draw);
     }
-    window.addEventListener('resize',resize); resize(); draw();
+    window.addEventListener('resize', resize); resize(); draw();
 
     // Плеер
     const audio = document.getElementById("audio");
@@ -287,7 +287,7 @@
         audio.play();
         playBtn.textContent = "⏸";
         eq.style.visibility="visible";
-      }else{
+      } else {
         audio.pause();
         playBtn.textContent = "▶";
         eq.style.visibility="hidden";
@@ -295,26 +295,39 @@
     });
 
     audio.addEventListener("timeupdate", ()=>{
-      const percent = (audio.currentTime / audio.duration) * 100;
-      progressBar.style.width = percent + "%";
+      if(!isNaN(audio.duration)){
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = percent + "%";
+      }
       let m = Math.floor(audio.currentTime/60).toString().padStart(2,"0");
       let s = Math.floor(audio.currentTime%60).toString().padStart(2,"0");
       timeEl.textContent = `${m}:${s}`;
     });
 
-    progress.addEventListener("click",(e)=>{
+    progress.addEventListener("click", (e)=>{
       const rect = progress.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = percent * audio.duration;
+      if(!isNaN(audio.duration)) audio.currentTime = percent * audio.duration;
     });
 
-    eq.style.visibility="hidden";
+    eq.style.visibility = "hidden";
 
-    // Управление громкостью
-    volumeSlider.addEventListener("input", ()=>{
-      audio.volume = volumeSlider.value;
-    });
+    // Громкость
+    volumeSlider.addEventListener("input", ()=>{ audio.volume = volumeSlider.value; });
     audio.volume = volumeSlider.value;
+
+    // Копирование контакта
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', async () => {
+      const text = document.getElementById('contact').href;
+      try {
+        await navigator.clipboard.writeText(text);
+        const old = copyBtn.textContent; copyBtn.textContent = 'Скопировано!';
+        setTimeout(()=> copyBtn.textContent = old, 1200);
+      } catch(e){
+        alert('Не удалось скопировать: ' + text);
+      }
+    });
   </script>
 </body>
 </html>
