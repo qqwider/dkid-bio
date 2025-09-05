@@ -28,7 +28,7 @@
     body{
       margin:0; color:var(--text); background:var(--bg-1);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      overflow:hidden;
+      overflow-x:hidden; /* убрали hidden, теперь можно скроллить вниз */
     }
     canvas#bgCanvas{position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;}
     a{color:var(--link); text-decoration:none}
@@ -149,6 +149,22 @@
       cursor: pointer;
       border: 2px solid var(--accent-2);
     }
+
+    /* 📱 Мобильная адаптация */
+    @media (max-width: 600px) {
+      .card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .avatar {
+        margin-bottom: 16px;
+      }
+      .kv-row {
+        grid-template-columns: 1fr; /* ключи и значения в столбик */
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
@@ -225,13 +241,20 @@
           setTimeout(typeEffect, 300);
         }
       } else {
-        setTimeout(()=>{
-          log.innerHTML = "";
-          const d = new Date();
-          const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
-          const time = d.toLocaleTimeString();
-          log.innerHTML = "Добро пожаловать ♛<br>" + `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${time}`;
-        },800);
+        setTimeout(() => {
+		  log.innerHTML = "";
+		  const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+
+		  function updateTime() {
+			const d = new Date();
+			const time = d.toLocaleTimeString();
+			log.innerHTML = "Добро пожаловать ♛<br>" + `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${time}`;
+		  }
+
+		  updateTime();                  // показать сразу
+		  setInterval(updateTime, 1000); // обновлять каждую секунду
+		}, 800);
+
       }
     }
     typeEffect();
