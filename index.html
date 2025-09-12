@@ -178,6 +178,20 @@
       .socials {justify-content:center;}
       .player {padding:10px;}
     }
+	/* Эффект зернистости */
+	body::after {
+	  content: "";
+	  position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999; /* поверх всего */
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJz48ZmlsdGVyIGlkPSdub2lzZUZpbHRlcic+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOTUnIG51bU9jdGF2ZXM9JzgnLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWx0ZXI9InVybCgjbm9pc2VGaWx0ZXIpIi8+PC9zdmc+");
+      opacity: 0.08; /* интенсивность зернистости */
+      animation: noiseMove 1s steps(8) infinite;
+    }
   </style>
 </head>
 <body class="dark">
